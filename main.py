@@ -25,60 +25,19 @@ print(f"✅ Transcription completed in {transcription_time:.2f} seconds.")
 
 summary_start = time.time()
 prompt = f"""
-# CRITICAL: Generate EXTENSIVE, ACCURATE Lecture Notes from Audio Transcription
-Source language: {language}
+Create a well-structured academic note in {language} based on the following transcription:
 
-## ESSENTIAL INFORMATION:
-* This transcription represents an ACTUAL LECTURE with visual demonstrations
-* The speaker likely points to drawings, graphs, or equations while speaking
-* Many critical concepts appear VISUALLY but are only referenced verbally
-* The notes MUST reconstruct these visual elements from context clues
-
-## REQUIRED LENGTH AND COMPLETENESS:
-* Generate at minimum 2000-3000 words of content (approximately 5-7 pages)
-* The notes MUST be significantly MORE DETAILED than the original transcription
-* EXPAND all abbreviated explanations and implied visual references
-* ADD explanatory content that would make these notes comprehensive and standalone
-
-## CONTENT ACCURACY REQUIREMENTS:
-* PARSE the transcription to identify the EXACT content being taught
-* DISTINGUISH between core academic content and casual speaking style
-* IDENTIFY all technical terms, formulas, and concepts mentioned
-* RECONSTRUCT any mathematical formulas in proper notation
-* VERIFY internal consistency of all technical information
-
-## STRUCTURE REQUIREMENTS:
-* Start with a comprehensive Table of Contents
-* Create properly nested sections (minimum 5 major sections with subsections)
-* Include numbered examples (minimum 5-8 complete examples)
-* Provide step-by-step explanations for each concept
-* Add visual descriptions using text/ASCII when appropriate
-* Include a glossary of all technical terms
-
-## ACADEMIC LANGUAGE TRANSFORMATION:
-* CONVERT all casual language to formal academic prose
-* REMOVE all conversational fillers and informal expressions
-* MAINTAIN all educational content while improving structure
-* STANDARDIZE all technical terminology
-* FORMAT mathematical content using Markdown conventions:
-  - Inline math: $equation$ (e.g., $y = x^2$)
-  - Display math: $$equation$$ (e.g., $$f(x) = ax^2 + bx + c$$)
-
-## QUALITY ASSURANCE STEPS:
-1. First, analyze the entire transcription to identify ALL key concepts
-2. Map out the logical structure of the complete lesson
-3. Identify all formulas, definitions, and examples mentioned
-4. Reconstruct visual elements that were likely shown but only referenced
-5. Fill gaps in explanation that would be unclear without visual context
-6. Cross-check all technical information for accuracy and consistency
-7. Verify completeness by ensuring ALL mentioned concepts are explained
-
-Here is the transcription to transform:
-```
 {transcription}
-```
 
-IMPORTANT: Your response should ONLY contain the comprehensive educational notes in proper academic format. No disclaimers, explanations, or meta-commentary.
+**Requirements:**  
+- Use proper markdown syntax and output only the formatted note.  
+- Ensure the note is **comprehensive**, covering all topics in the transcription.  
+- Organize content with **clear headings, subheadings, and bullet points**.  
+- Use `$...$` for inline math and `$$...$$` for block math expressions.  
+- Format key terms, definitions, and equations appropriately.  
+- Summarize complex concepts concisely while maintaining accuracy.  
+
+Do not include any additional text outside the markdown-formatted note.
 """
 
 print("Summarizing transcription...")
