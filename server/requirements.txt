@@ -1,0 +1,4 @@
+fastapi==0.115.12
+ollama==0.4.7
+openai_whisper==20240930
+torch==2.5.1+cu121
