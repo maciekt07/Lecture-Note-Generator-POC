@@ -1,4 +1,6 @@
 /output.md
 /transcription.txt
 /audio
+/media
 /__pycache__
+*.db

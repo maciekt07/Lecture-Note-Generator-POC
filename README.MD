@@ -1,7 +1,7 @@
 # Lecture Note Generator
 
 <p align="center">
-<img src="https://go-skill-icons.vercel.app/api/icons?i=py,fastapi,ollama,chatgpt,react,typescript,tailwindcss" />
+<img src="https://go-skill-icons.vercel.app/api/icons?i=py,fastapi,sqlite,ollama,chatgpt,react,typescript,zustand,tailwindcss" />
 </p>
 
 A web application that converts lecture audio recordings into structured academic notes. Uses Whisper for transcription and Llama 3.1-8B for note generation.
@@ -11,7 +11,11 @@ A web application that converts lecture audio recordings into structured academi
 ## Stack
 
 - Frontend: React + TypeScript + Tailwind CSS
-- Backend: FastAPI + Whisper + Ollama
+- Backend: Python + FastAPI + Whisper + Ollama
+
+## Features
+
+- Note history stored in a local SQLite database
 - Real-time updates via WebSocket
 - Math rendering with KaTeX
 
