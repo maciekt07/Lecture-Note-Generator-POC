@@ -13,17 +13,18 @@ class Database:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
                     content TEXT NOT NULL,
+                    summary TEXT NOT NULL,
                     language TEXT NOT NULL,
                     audio_path TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
 
-    def add_note(self, title: str, content: str, language: str, audio_path: str = None) -> int:
+    def add_note(self, title: str, content: str, summary: str, language: str, audio_path: str = None) -> int:
         with sqlite3.connect(self.db_file) as conn:
             cursor = conn.execute(
-                "INSERT INTO notes (title, content, language, audio_path) VALUES (?, ?, ?, ?)",
-                (title, content, language, audio_path)
+                "INSERT INTO notes (title, content, summary, language, audio_path) VALUES (?, ?, ?, ?, ?)",
+                (title, content, summary, language, audio_path)
             )
             return cursor.lastrowid
 
@@ -31,7 +32,7 @@ class Database:
         with sqlite3.connect(self.db_file) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
-                "SELECT id, title, content, language, created_at FROM notes ORDER BY created_at DESC"
+                "SELECT id, title, content, summary, language, created_at FROM notes ORDER BY created_at DESC"
             )
             return [dict(row) for row in cursor.fetchall()]
 
@@ -39,7 +40,7 @@ class Database:
         with sqlite3.connect(self.db_file) as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
-                "SELECT id, title, content, language, created_at FROM notes WHERE id = ?",
+                "SELECT id, title, content, summary, language, created_at FROM notes WHERE id = ?",
                 (note_id,)
             )
             result = cursor.fetchone()

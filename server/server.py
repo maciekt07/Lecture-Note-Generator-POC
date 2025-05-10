@@ -57,7 +57,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 total_bytes.extend(data)
                 if len(total_bytes) % (1024 * 1024) == 0:
                     logger.info(f"Received {len(total_bytes) // (1024 * 1024)} MB")
-                await websocket.send_text(f"Progress: Received {len(total_bytes) // (1024 * 1024)} MB")
             except Exception as e:
                 logger.error(f"WebSocket receive error: {e}")
                 await websocket.send_text(f"Error: {e}")
@@ -110,6 +109,7 @@ Requirements:
 - Keep it concise but descriptive
 - Focus on the main topic
 - Do not use quotes or special characters
+- Only answer in language: {language}
 - Return only the title, nothing else
 """
         title = ""
@@ -126,11 +126,17 @@ Create a well-structured academic note in {language} based on the following tran
 {transcription}
 
 Requirements:
-- Use markdown formatting
-- Clear headings, subheadings, bullet points
-- Use $...$ for inline math, $$...$$ for block math
-- Do not include extra content, only the note
-- Do not include separators, links, or quotes
+- Write the output as a complete, well-formatted markdown document
+- Start with the main header using # for the title
+- Use ## for section headers and ### for subsections
+- Use bullet points where appropriate
+- Use $...$ for inline math and $$...$$ for block math formulas
+- For any mathematical tables (e.g., x/y values), use LaTeX array format inside $$...$$, not Markdown tables
+- Make sure all sections are properly separated with newlines
+- Format the text in complete sentences and paragraphs
+- Write naturally without breaking up words or sentences
+- Return the complete note as a single coherent document
+- Only answer in language: {language}
 """
         # generate short description first
         description_prompt = f"""Generate a 1-2 sentence summary of this content:
@@ -140,6 +146,7 @@ Requirements:
 - Keep it very concise (max 2 sentences)
 - Focus on the main topic and key points
 - Make it engaging but academic
+- Only answer in language: {language}
 - Return only the summary, nothing else"""
 
         description = ""
@@ -147,22 +154,54 @@ Requirements:
             description += chunk["response"]
         description = description.strip()
 
-        note_content = f"# {title}\n\n_{description}_\n\n"  # Add title and description at the top
-        
+        # Generate and stream the content
+        markdown_content = ""
+        current_paragraph = []
+        await websocket.send_text("# " + title + "\n\n")
+
         for chunk in ollama.generate(model=OLLAMA_MODEL, prompt=notes_prompt, stream=True):
             response = chunk["response"]
-            note_content += response
-            if "\n" in note_content:
-                lines = note_content.split("\n")
-                for line in lines[:-1]:
-                    if line.strip():
-                        await websocket.send_text(line + "\n")
-                note_content = lines[-1]
-        if note_content.strip():
-            await websocket.send_text(note_content)
+            markdown_content += response
+            
+            # Split into sentences and sections
+            if "." in response or "\n" in response or len("".join(current_paragraph)) > 100:
+                current_text = "".join(current_paragraph) + response
+                sentences = current_text.split(".")
+                
+                # Process all complete sentences
+                for sentence in sentences[:-1]:
+                    if sentence.strip():
+                        await websocket.send_text(sentence.strip() + ".\n")
+                
+                # Keep any incomplete sentence
+                current_paragraph = [sentences[-1]]
+                
+                # Handle section breaks
+                if "\n" in response:
+                    sections = response.split("\n")
+                    for section in sections:
+                        if section.strip():
+                            await websocket.send_text(section.strip() + "\n")
+                    current_paragraph = []
+            else:
+                current_paragraph.append(response)
+                
+        # Send any remaining content
+        if current_paragraph:
+            final_text = "".join(current_paragraph).strip()
+            if final_text:
+                await websocket.send_text(final_text)
 
-        # save note to DB
-        note_id = db.add_note(title=title, content=note_content, language=language)
+        # Construct final note content
+        note_content = f"# {title}\n\n{markdown_content.strip()}"
+
+        # save note to DB with separate summary
+        note_id = db.add_note(
+            title=title,
+            content=note_content,
+            summary=description,
+            language=language
+        )
 
         # save audio
         media_dir = f"media/audio/{note_id}"
@@ -182,6 +221,60 @@ Requirements:
         except Exception as e:
             logger.error(f"Cleanup error: {e}")
         await websocket.close()
+
+async def generate_note_content(websocket: WebSocket, model: str, prompt: str) -> str:
+    """Generate and stream note content with proper formatting."""
+    content = []
+    current_block = []
+    
+    await websocket.send_text("\n")  # Initial newline for proper formatting
+    
+    for chunk in ollama.generate(model=model, prompt=prompt, stream=True):
+        text = chunk["response"]
+        
+        # Split on common markdown and sentence boundaries
+        splits = []
+        current = ""
+        for char in text:
+            current += char
+            # Check for markdown block boundaries or sentence endings
+            if (current.endswith("\n\n") or 
+                current.endswith(". ") or 
+                current.endswith("# ") or 
+                current.endswith("## ")):
+                splits.append(current)
+                current = ""
+        if current:
+            splits.append(current)
+        
+        # Process each split
+        for split in splits:
+            if split.strip():
+                # If it's a header or complete sentence, send immediately
+                if (split.strip().startswith("#") or 
+                    split.strip().endswith(".") or 
+                    "\n\n" in split):
+                    await websocket.send_text(split.strip())
+                    content.append(split.strip())
+                else:
+                    # Otherwise, add to current block
+                    current_block.append(split)
+                    # If we have a reasonable amount of content, send it
+                    if len("".join(current_block)) > 50:
+                        block = "".join(current_block).strip()
+                        if block:
+                            await websocket.send_text(block)
+                            content.append(block)
+                        current_block = []
+    
+    # Send any remaining content
+    if current_block:
+        final_block = "".join(current_block).strip()
+        if final_block:
+            await websocket.send_text(final_block)
+            content.append(final_block)
+    
+    return "\n".join(content)
 
 @app.get("/api/notes")
 async def get_notes():

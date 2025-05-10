@@ -1,4 +1,4 @@
-# Lecture Note Generator
+# AI Lecture Note Generator POC
 
 <p align="center">
 <img src="https://go-skill-icons.vercel.app/api/icons?i=py,fastapi,sqlite,ollama,chatgpt,react,typescript,zustand,tailwindcss" />
@@ -44,3 +44,7 @@ npm run dev
 ```
 
 Open `http://localhost:5173` in your browser.
+
+## Credits
+
+Made with ❤️ by [maciekt07](https://github.com/maciekt07), licensed under [MIT](https://github.com/maciekt07/Lecture-Note-Generator-POC/blob/main/LICENSE).

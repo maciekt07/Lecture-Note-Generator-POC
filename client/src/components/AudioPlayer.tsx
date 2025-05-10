@@ -92,7 +92,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src }) => {
             max={duration || 0}
             value={currentTime}
             onChange={handleTimeChange}
-            className="flex-1 mx-2 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm"
+            className="flex-1 mx-2 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            style={{
+              accentColor: "#4338ca",
+            }}
           />
           <span className="text-sm text-gray-500 w-12">
             {formatTime(duration)}
@@ -108,7 +111,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src }) => {
             step={0.1}
             value={volume}
             onChange={handleVolumeChange}
-            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer range-sm"
+            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            style={{
+              accentColor: "#4338ca",
+            }}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNotes } from "../NotesContext";
-import { ClockIcon } from "@heroicons/react/24/outline";
+import { ClockIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
@@ -18,9 +18,10 @@ const Sidebar: React.FC = () => {
         <nav className="space-y-1">
           <button
             onClick={() => navigate("/")}
-            className={`w-full text-left p-3 rounded-lg transition-colors duration-150 hover:bg-gray-50 text-gray-700`}
+            className="w-full text-left p-3 rounded-lg transition-colors duration-150 hover:bg-gray-50 text-gray-700 flex items-center gap-2"
           >
-            New Transcription
+            <PlusIcon className="h-5 w-5" />
+            New Note
           </button>
 
           <div className="border-t my-2" />

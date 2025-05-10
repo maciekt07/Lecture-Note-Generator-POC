@@ -1,43 +1,40 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNotes } from "../NotesContext";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import AudioPlayer from "../components/AudioPlayer";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import type { Note } from "../types/types";
 
 const NoteView = () => {
   const { noteId } = useParams();
   const navigate = useNavigate();
-  const { notes, addNote } = useNotes();
-  // FIXME: display full markdown content
-  // fetch updated note content
+  const { fetchNote } = useNotes();
+  const [note, setNote] = useState<Note | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if (noteId) {
-      const fetchUpdatedNote = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:8000/api/notes/${noteId}`
-          );
-          const data = await response.json();
-          if (data) {
-            addNote(data);
-          }
-        } catch (error) {
-          console.error("Error fetching updated note:", error);
-        }
-      };
-      fetchUpdatedNote();
+    const loadNote = async () => {
+      if (!noteId) return;
+      setLoading(true);
+      const loadedNote = await fetchNote(Number(noteId));
+      if (loadedNote) {
+        setNote(loadedNote);
+      }
+      setLoading(false);
+    };
+    loadNote();
+  }, [noteId, fetchNote]);
 
-      //FIXME:
-      const interval = setInterval(fetchUpdatedNote, 5000);
-      return () => clearInterval(interval);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [noteId]);
-
-  const note = notes.find((n) => n.id === Number(noteId));
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   if (!note) {
     return (
@@ -47,15 +44,6 @@ const NoteView = () => {
     );
   }
 
-  let description = "";
-  let mainContent = note.content;
-
-  const descriptionMatch = note.content.match(/\n_(.*?)_\n/);
-  if (descriptionMatch) {
-    description = descriptionMatch[1];
-    mainContent = note.content.replace(/\n_(.*?)_\n/, "\n");
-  }
-
   return (
     <div className="space-y-6">
       <button
@@ -63,12 +51,11 @@ const NoteView = () => {
         className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
       >
         <ArrowLeftIcon className="h-5 w-5 mr-2" />
-        Back to Transcription
+        Back to Note Generation
       </button>
 
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{note.title}</h1>
-        <div></div>
         <div className="text-sm text-gray-500 mb-4">
           Created on {new Date(note.created_at).toLocaleDateString()} <br />
           Language:{" "}
@@ -77,20 +64,20 @@ const NoteView = () => {
           }).of(note.language)}
         </div>
 
-        {description && (
+        {note.summary && (
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-gray-700 italic">{description}</p>
+            <p className="text-gray-700 italic">{note.summary}</p>
           </div>
         )}
 
         <AudioPlayer src={`http://localhost:8000/api/audio/${note.id}`} />
 
-        <div className="prose prose-indigo max-w-none mt-6">
+        <div className="prose prose-indigo max-w-none mt-6 p-4 rounded-lg bg-gradient-to-br from-indigo-100 via-white to-purple-100">
           <ReactMarkdown
             remarkPlugins={[remarkMath]}
             rehypePlugins={[rehypeKatex]}
           >
-            {mainContent}
+            {note.content}
           </ReactMarkdown>
         </div>
       </div>
