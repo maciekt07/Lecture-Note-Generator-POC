@@ -67,7 +67,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src }) => {
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full max-w-md bg-gray-50 rounded-lg p-4">
+    <div className="flex flex-col space-y-2 w-full bg-gray-50 rounded-lg p-4">
       <audio ref={audioRef} src={src} preload="metadata" />
 
       <div className="flex items-center justify-between">

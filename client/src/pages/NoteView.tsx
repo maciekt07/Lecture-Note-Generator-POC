@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import AudioPlayer from "../components/AudioPlayer";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import type { Note } from "../types/types";
 
 const NoteView = () => {
@@ -69,9 +69,12 @@ const NoteView = () => {
             <p className="text-gray-700 italic">{note.summary}</p>
           </div>
         )}
-
+        <h2 className="text-xl font-bold text-gray-700 mb-2">Orginal Audio</h2>
         <AudioPlayer src={`http://localhost:8000/api/audio/${note.id}`} />
-
+        <h3 className="text-xl font-bold text-gray-700 mb-2 mt-6 flex items-center space-x-2">
+          <SparklesIcon className="h-5 w-5 text-purple-500" />
+          <span>Generated Notes</span>
+        </h3>
         <div className="prose prose-indigo max-w-none mt-6 p-4 rounded-lg bg-gradient-to-br from-indigo-100 via-white to-purple-100">
           <ReactMarkdown
             remarkPlugins={[remarkMath]}
