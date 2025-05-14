@@ -3,7 +3,7 @@
 
 echo "Starting backend..."
 cd server
-uvicorn server:app --reload &
+python run.py &
 SERVER_PID=$!
 cd ..
 

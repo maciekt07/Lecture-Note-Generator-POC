@@ -1,8 +1,9 @@
 import sqlite3
 from typing import List, Dict
+from app.core.config import DB_FILE
 
 class Database:
-    def __init__(self, db_file="notes.db"):
+    def __init__(self, db_file=DB_FILE):
         self.db_file = db_file
         self._init_db()
 

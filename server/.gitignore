@@ -2,5 +2,6 @@
 /transcription.txt
 /audio
 /media
-/__pycache__
+/venv
+__pycache__/
 *.db

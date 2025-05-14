@@ -1,7 +1,7 @@
 # AI Lecture Note Generator POC
 
 <p align="center">
-<img src="https://go-skill-icons.vercel.app/api/icons?i=py,fastapi,sqlite,ollama,chatgpt,react,typescript,zustand,tailwindcss" />
+<img src="https://go-skill-icons.vercel.app/api/icons?i=py,fastapi,sqlite,ollama,chatgpt,react,typescript,vite,zustand,tailwindcss" />
 </p>
 
 A web application that converts lecture audio recordings into structured academic notes. Uses Whisper for transcription and Llama 3.1-8B for note generation.
@@ -32,7 +32,7 @@ A web application that converts lecture audio recordings into structured academi
 ```bash
 cd server
 pip install -r requirements.txt
-uvicorn server:app --reload
+python run.py
 ```
 
 ### Frontend
